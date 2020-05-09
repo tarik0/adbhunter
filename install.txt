@@ -1,5 +1,0 @@
-pip install flask
-pip install shodan
-pip install cheerot
-pip install colorama
-pip install ipaddr
