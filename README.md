@@ -1,1 +1,1 @@
-# 📱 ADBHUNTER | Zaafiyetli Android Makine Bulucu ve İstismar Edici
+# 📱 ADBHUNTER | Vulnerable Android Device Finder
